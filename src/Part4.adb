@@ -8,7 +8,8 @@ with Ada.Calendar;
 use  Ada.Calendar;
 
 procedure Part4 is
-	vTime, boot_time, f1_last: Duration;
+	boot_time: Time;
+	vTime, f1_last: Duration;
 	vMsec: Integer;
 	f3_flag: Boolean;
 	
@@ -20,10 +21,10 @@ procedure Part4 is
 	
 	-- Simulates a procedure executing for a variable period of time
 	-- Prints out a message when it starts and finishes
-	procedure F(Name: String; Run_time: Duration; Boot_time: Duration) is 
+	procedure F(Name: String; Run_time: Duration; Boot_time: Time) is 
 		vTime, start : Duration;
 	begin
-		vTime := Ada.Calendar.Seconds(Ada.Calendar.Clock) - boot_time;
+		vTime := Ada.Calendar.Clock - boot_time;
 		start := vTime;
 		
 		Put(Name);
@@ -33,7 +34,7 @@ procedure Part4 is
 		
 		loop --a busy loop for a simple "F* procedure"
 			exit when vTime - start >= run_time;
-			vTime := Ada.Calendar.Seconds(Ada.Calendar.Clock) - boot_time;
+			vTime := Ada.Calendar.Clock - boot_time;
 		end loop;
 		
 		Put(Name);
@@ -45,12 +46,12 @@ procedure Part4 is
 
 begin
 	vTime := 0.0;
-	f1_last := 0.0;
+	f1_last := 0.0; -- Assignment description requires F1 not execute immediately after program start but at 1 second
 	f3_flag := False;
-	boot_time := Ada.Calendar.Seconds(Ada.Calendar.Clock);
+	boot_time := Ada.Calendar.Clock;
 
 	loop
-		vTime := Ada.Calendar.Seconds(Ada.Calendar.Clock) - boot_time;
+		vTime := Ada.Calendar.Clock - boot_time;
 
 		-- Execute F1 every 1 second (with drift control)
 		-- Execute F2 after F1 finishes
