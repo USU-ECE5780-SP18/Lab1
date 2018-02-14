@@ -27,20 +27,14 @@ procedure Part4 is
 		vTime := Ada.Calendar.Clock - boot_time;
 		start := vTime;
 		
-		Put(name);
-		Put(" has started executing. The time is now:");
-		DIO.Put(vTime);
-		Put_Line("");
+		Put(name); Put(" has started executing. The time is now:"); DIO.Put(vTime); Put_Line("");
 		
-		loop --a busy loop for a simple "F* procedure"
+		loop -- a busy loop for simulating a simple "F* procedure" executing for the given duration run_time
 			exit when vTime - start >= run_time;
 			vTime := Ada.Calendar.Clock - boot_time;
 		end loop;
 		
-		Put(name);
-		Put(" has finished executing. The time is now:");
-		DIO.Put(vTime);
-		Put_Line("");
+		Put(name); Put(" has finished executing. The time is now:"); DIO.Put(vTime); Put_Line(""); 
 		Put_Line("");
 	end F;
 
@@ -60,7 +54,7 @@ begin
 			f1_last := vTime;
 			f3_flag := True;
 			
-			F(name => "F1", run_time => 0.300, boot_time => boot_time);
+			F(name =>    "F1", run_time => 0.300, boot_time => boot_time);
 			F(name => " - F2", run_time => 0.150, boot_time => boot_time);
 		end if;
 		
