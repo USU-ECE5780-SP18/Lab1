@@ -60,13 +60,13 @@ begin
 			f3_flag := True;
 			
 			F(Name => "F1", Run_time => 0.300, Boot_time => boot_time);
-			F(Name => "F2", Run_time => 0.150, Boot_time => boot_time);
+			F(Name => " - F2", Run_time => 0.150, Boot_time => boot_time);
 		end if;
 		
 		-- Execute F3 0.5 seconds after F1 starts
 		if f3_flag = True and then vTime - f1_last >= 0.500 then
 			f3_flag := False;
-			F(Name => "F3", Run_time => 0.200, Boot_time => boot_time);
+			F(Name => " - F3", Run_time => 0.200, Boot_time => boot_time);
 		end if;
 		
 	end loop; --Main loop
