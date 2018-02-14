@@ -12,28 +12,37 @@ use  Text_Io;
 
 procedure Part5 is
 	task type watch_dog is
-		entry prime(Deadline : in Time);
+		entry prime(deadline : in Time);
 		entry diffuse;
+		entry watch;
 	end watch_dog;
 	task body watch_dog is
+		active: Boolean := false;
 		finished: Boolean := false;
+		wake_deadline : Time;
 	begin
 		loop
 			select
-				accept prime(deadline : Time) do
+				when active => accept watch do
 					finished := false;
 					Put_Line(" - F3 watchdog primed");
-					delay until deadline;
+					delay until wake_deadline;
 					
 					-- if f3 is running print warning
-					if finished = false then
+					if active = true and then finished = false then
 						Put_Line(" - F3 missed its deadline");
 					end if;
+				end watch;
+			or
+				accept prime(deadline : Time) do
+					active := true;
+					wake_deadline := deadline;
 				end prime;
 			or
 				accept diffuse do
-					Put_Line(" - F3 watchdog diffused");
+					active := false;
 					finished := true;
+					Put_Line(" - F3 watchdog diffused");
 				end diffuse;
 			end select;
 		end loop;
@@ -59,7 +68,7 @@ procedure Part5 is
 		vTime := Ada.Calendar.Clock - boot_time;
 		start := vTime;
 		
-		Put(name); Put(" has started executing. The time is now:"); DIO.Put(vTime); Put_Line("");
+		Put(name); Put(" has  started executing. The time is now:"); DIO.Put(vTime); Put_Line("");
 		
 		loop -- a busy loop for simulating a simple "F* procedure" executing for the given duration run_time
 			exit when vTime - start >= run_time;
@@ -101,6 +110,10 @@ begin
 			f3_watch.prime(boot_time + f1_next);
 			F(name => " - F3", run_time => Duration(f3_time), boot_time => boot_time);
 			f3_watch.diffuse;
+			
+			-- if result_of_diffuse_inidcates_failure then
+				-- f1_next := f1_next + 1.000;
+			-- end if;
 		end if;
 		
 	end loop; --Main loop
