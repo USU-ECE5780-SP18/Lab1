@@ -21,13 +21,13 @@ procedure Part4 is
 	
 	-- Simulates a procedure executing for a variable period of time
 	-- Prints out a message when it starts and finishes
-	procedure F(Name: String; Run_time: Duration; Boot_time: Time) is 
+	procedure F(name: String; run_time: Duration; boot_time: Time) is 
 		vTime, start : Duration;
 	begin
 		vTime := Ada.Calendar.Clock - boot_time;
 		start := vTime;
 		
-		Put(Name);
+		Put(name);
 		Put(" has started executing. The time is now:");
 		DIO.Put(vTime);
 		Put_Line("");
@@ -37,7 +37,7 @@ procedure Part4 is
 			vTime := Ada.Calendar.Clock - boot_time;
 		end loop;
 		
-		Put(Name);
+		Put(name);
 		Put(" has finished executing. The time is now:");
 		DIO.Put(vTime);
 		Put_Line("");
@@ -60,14 +60,14 @@ begin
 			f1_last := vTime;
 			f3_flag := True;
 			
-			F(Name => "F1", Run_time => 0.300, Boot_time => boot_time);
-			F(Name => " - F2", Run_time => 0.150, Boot_time => boot_time);
+			F(name => "F1", run_time => 0.300, boot_time => boot_time);
+			F(name => " - F2", run_time => 0.150, boot_time => boot_time);
 		end if;
 		
 		-- Execute F3 0.5 seconds after F1 starts
 		if f3_flag = True and then vTime - f1_last >= 0.500 then
 			f3_flag := False;
-			F(Name => " - F3", Run_time => 0.200, Boot_time => boot_time);
+			F(name => " - F3", run_time => 0.200, boot_time => boot_time);
 		end if;
 		
 	end loop; --Main loop
