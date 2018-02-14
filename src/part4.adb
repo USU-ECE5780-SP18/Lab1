@@ -9,8 +9,7 @@ use  Text_Io;
 
 procedure Part4 is
 	boot_time: Time;
-	vTime, f1_last: Duration;
-	vMsec: Integer;
+	vTime, f1_prev, f1_next: Duration;
 	f3_flag: Boolean;
 	
 	-- To print Duration variables you can instantiate the generic package Text_Io.Fixed_Io with a duration type: 
@@ -40,7 +39,8 @@ procedure Part4 is
 
 begin
 	vTime := 0.0;
-	f1_last := 0.0; -- Assignment description requires F1 not execute immediately after program start but at 1 second
+	f1_prev := 0.0;
+	f1_next := 1.0;
 	f3_flag := False;
 	boot_time := Ada.Calendar.Clock;
 
@@ -49,17 +49,17 @@ begin
 
 		-- Execute F1 every 1 second (with drift control)
 		-- Execute F2 after F1 finishes
-		vMsec := Integer(vTime * 1000) mod 1000;
-		if vTime - f1_last >= 1.000 and then vMsec <= 50 then
-			f1_last := vTime;
+		if vTime - f1_next >= 0.0 then
+			f1_prev := vTime;
 			f3_flag := True;
+			f1_next := f1_next + 1.000;
 			
 			F(name =>    "F1", run_time => 0.300, boot_time => boot_time);
 			F(name => " - F2", run_time => 0.150, boot_time => boot_time);
 		end if;
 		
 		-- Execute F3 0.5 seconds after F1 starts
-		if f3_flag = True and then vTime - f1_last >= 0.500 then
+		if f3_flag = True and then vTime - f1_prev >= 0.500 then
 			f3_flag := False;
 			F(name => " - F3", run_time => 0.200, boot_time => boot_time);
 		end if;
