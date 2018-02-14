@@ -11,15 +11,32 @@ with Text_Io;
 use  Text_Io;
 
 procedure Part5 is
-	task watch_dog is
-		entry aname();
+	task type watch_dog is
+		entry prime(Deadline : in Time);
+		entry diffuse;
 	end watch_dog;
 	task body watch_dog is
+		finished: Boolean := false;
 	begin
-
-		accept aname() do
-			--
-		end aname;
+		loop
+			select
+				accept prime(deadline : Time) do
+					finished := false;
+					Put_Line(" - F3 watchdog primed");
+					delay until deadline;
+					
+					-- if f3 is running print warning
+					if finished = false then
+						Put_Line(" - F3 missed its deadline");
+					end if;
+				end prime;
+			or
+				accept diffuse do
+					Put_Line(" - F3 watchdog diffused");
+					finished := true;
+				end diffuse;
+			end select;
+		end loop;
 	end watch_dog;
 
 	rng: Generator;
@@ -53,9 +70,8 @@ procedure Part5 is
 		Put_Line("");
 	end F;
 
+	f3_watch: watch_dog;
 begin
-	watch_dog_f3: watch_dog;
-
 	Reset(rng); -- Seeding or equivalent operation to ensure unique state for rng
 	vTime := 0.0;
 	f1_prev := 0.0;
@@ -81,7 +97,10 @@ begin
 		if f3_flag = True and then vTime - f1_prev >= 0.500 then
 			f3_flag := False;
 			f3_time := 0.2 + (0.4 * Random(rng)); -- give f3 a random execution time between 0.2 and 0.6
+			
+			f3_watch.prime(boot_time + f1_next);
 			F(name => " - F3", run_time => Duration(f3_time), boot_time => boot_time);
+			f3_watch.diffuse;
 		end if;
 		
 	end loop; --Main loop
