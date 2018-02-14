@@ -9,6 +9,7 @@ use  Ada.Calendar;
 
 procedure Part4 is
 	vTime, boot_time, f1_last: Duration;
+	vMsec: Integer;
 	f3_flag: Boolean;
 	
 	-- To print Duration variables you can instantiate the generic package Text_Io.Fixed_Io with a duration type: 
@@ -51,9 +52,10 @@ begin
 	loop
 		vTime := Ada.Calendar.Seconds(Ada.Calendar.Clock) - boot_time;
 
-		-- Execute F1 every 1 second
+		-- Execute F1 every 1 second (with drift control)
 		-- Execute F2 after F1 finishes
-		if vTime - f1_last >= 1.000 then
+		vMsec := Integer(vTime * 1000) mod 1000;
+		if vTime - f1_last >= 1.000 and then vMsec <= 50 then
 			f1_last := vTime;
 			f3_flag := True;
 			
