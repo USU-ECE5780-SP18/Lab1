@@ -22,6 +22,8 @@ procedure Part5 is
 		end aname;
 	end watch_dog;
 
+	rng: Generator;
+	f3_time: Float;
 	boot_time: Time;
 	vTime, f1_last: Duration;
 	vMsec: Integer;
@@ -54,7 +56,8 @@ procedure Part5 is
 
 begin
 	watch_dog_f3: watch_dog;
-   
+
+	Reset(rng); -- Seeding or equivalent operation to ensure unique state for rng
 	vTime := 0.0;
 	f1_last := 0.0; -- Assignment description requires F1 not execute immediately after program start but at 1 second
 	f3_flag := False;
@@ -77,7 +80,8 @@ begin
 		-- Execute F3 0.5 seconds after F1 starts
 		if f3_flag = True and then vTime - f1_last >= 0.500 then
 			f3_flag := False;
-			F(name => " - F3", run_time => 0.200, boot_time => boot_time);
+			f3_time := 0.2 + (0.4 * Random(rng)); -- give f3 a random execution time between 0.2 and 0.6
+			F(name => " - F3", run_time => Duration(f3_time), boot_time => boot_time);
 		end if;
 		
 	end loop; --Main loop
