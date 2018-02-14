@@ -1,11 +1,14 @@
+with Ada.Calendar;
+use  Ada.Calendar;
+
+with Ada.Numerics.Float_Random;
+use  Ada.Numerics.Float_Random;
+
 with Ada.Text_IO;
 use  Ada.Text_IO;
 
 with Text_Io;
 use  Text_Io;
-
-with Ada.Calendar;
-use  Ada.Calendar;
 
 procedure Part5 is
 	task watch_dog is

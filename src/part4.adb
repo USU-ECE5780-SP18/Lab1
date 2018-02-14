@@ -1,11 +1,11 @@
+with Ada.Calendar;
+use  Ada.Calendar;
+
 with Ada.Text_IO;
 use  Ada.Text_IO;
 
 with Text_Io;
 use  Text_Io;
-
-with Ada.Calendar;
-use  Ada.Calendar;
 
 procedure Part4 is
 	boot_time: Time;
