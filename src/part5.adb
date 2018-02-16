@@ -11,39 +11,35 @@ with Text_Io;
 use  Text_Io;
 
 procedure Part5 is
+	f3_deadline: Time;
+	f3_finished: Boolean := false;
+	f3_missed_dl: Boolean := false;
+
 	task type watch_dog is
 		entry prime(deadline : in Time);
-		entry diffuse;
-		entry watch;
 	end watch_dog;
 	task body watch_dog is
 		active: Boolean := false;
-		finished: Boolean := false;
-		wake_deadline : Time;
+		dl : Time;
 	begin
 		loop
+			if active then
+				Put_Line(" - F3 watchdog primed");
+				delay until dl;
+				
+				-- if f3 is running print warning
+				if active = true and then f3_finished = false then
+					f3_missed_dl := true;
+					Put_Line(" - F3 missed its deadline");
+				end if;
+			end if;
 			select
-				when active => accept watch do
-					finished := false;
-					Put_Line(" - F3 watchdog primed");
-					delay until wake_deadline;
-					
-					-- if f3 is running print warning
-					if active = true and then finished = false then
-						Put_Line(" - F3 missed its deadline");
-					end if;
-				end watch;
-			or
 				accept prime(deadline : Time) do
+					f3_missed_dl := false;
+					f3_finished := false;
+					dl := deadline;
 					active := true;
-					wake_deadline := deadline;
 				end prime;
-			or
-				accept diffuse do
-					active := false;
-					finished := true;
-					Put_Line(" - F3 watchdog diffused");
-				end diffuse;
 			end select;
 		end loop;
 	end watch_dog;
@@ -107,13 +103,17 @@ begin
 			f3_flag := False;
 			f3_time := 0.2 + (0.4 * Random(rng)); -- give f3 a random execution time between 0.2 and 0.6
 			
-			f3_watch.prime(boot_time + f1_next);
+			f3_deadline := boot_time + f1_next;
+			f3_watch.prime(f3_deadline);
 			F(name => " - F3", run_time => Duration(f3_time), boot_time => boot_time);
-			f3_watch.diffuse;
+			f3_finished := true;
 			
-			-- if result_of_diffuse_inidcates_failure then
-				-- f1_next := f1_next + 1.000;
-			-- end if;
+			-- Deal with the case where F3 missed its deadline
+			loop
+				exit when Ada.Calendar.Clock < f3_deadline;
+				f1_next := f1_next + 1.000;
+				f3_deadline := boot_time + f1_next;
+			end loop;
 		end if;
 		
 	end loop; --Main loop
