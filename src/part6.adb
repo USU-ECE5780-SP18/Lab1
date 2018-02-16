@@ -8,57 +8,71 @@ with Ada.Text_IO;
 use  Ada.Text_IO;
 
 procedure Part6 is
+	-- The buffer resource in the sender/receiver or producer/consumer pattern
+	-- Receives a close signal from the consumer
 	task type buffer is
 		entry push(n : in Integer);
 		entry pop(n : out Integer);
 		entry close;
 	end buffer;
 	
+	-- Generates random integers between 0 and 25
+	-- Receives a close signal from the consumer
 	task type producer is
 		entry close;
 	end producer;
 	
-	task type consumer is
-	end consumer;
+	-- Receives numbers from buffer and sums them together
+	-- Upon reaching a sum of 100 or greater sends a close signal to buffer and producer
+	task type consumer;
 	
 	t_buff : buffer;
 	t_prod : producer;
 	t_cons : consumer;
 	
+	-- Implements a circular buffer
+	-- Includes locking mechanisms for push (if full) and pop (if empty) operations
+	-- Task closes gracefully when it receives a close signal from the consumer
 	task body buffer is
-		done: Boolean := false;
+		done: Boolean := false; -- the flag that is updated when the close signal is received
 		full: Boolean := false;
-		empty: Boolean := true;
-		buff: array(0 .. 9) of Integer;
-		front: Integer := 0;
-		back: Integer := 0;
+		empty: Boolean := true; -- a convenient shorthand for 'front == back && !full'
+		
 		SIZE : constant := 10;
+		buff: array(0 .. 9) of Integer;
+		
+		front: Integer := 0; -- index of the circular buff array from which elements are popped
+		back: Integer := 0; -- index of the circular buff array from which elements are pushed
 	begin
 		loop
 			exit when done;
 			select
 				when not full =>
 					accept push(n: Integer) do
+						-- Thanks to our condition on accept the 'empty' in "front = back && empty" is implied
 						if front = back then
 							empty := false;
 						end if;
 						
 						buff(back) := n;
-						back := (back + 1) mod SIZE;
+						back := (back + 1) mod SIZE; -- mod SIZE => circular buffer
 						
+						-- Update our flag if adding this entry fills the circular buffer
 						if front = back then
 							full := true;
 						end if;
 					end push;
 				or when not empty =>
 					accept pop(n: out Integer) do
+						-- Thanks to our condition on accept the 'full' in "front = back && full" is implied
 						if front = back then
 							full := false;
 						end if;
 						
 						n := buff(front);
-						front := (front + 1) mod SIZE;
+						front := (front + 1) mod SIZE; -- mod SIZE => circular buffer
 						
+						-- Update our flag if removing this entry empties the circular buffer
 						if front = back then
 							empty := true;
 						end if;
