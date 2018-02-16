@@ -7,7 +7,7 @@ use  Ada.Numerics.Float_Random;
 with Ada.Text_IO;
 use  Ada.Text_IO;
 
-procedure Part6 is
+procedure part6 is
 	task type buffer is
 		entry push(n : in Integer);
 		entry pop(n : out Integer);
@@ -65,14 +65,20 @@ procedure Part6 is
 					end pop;
 				or
 					accept close do
-						if full then
-							empty := true;
-							full := false;
-						end if;
 						done := true;
 					end close;
 			end select;
 		end loop;
+		
+		select
+			accept push(n: Integer) do
+				null;
+			end push;
+		else
+			null;
+		end select;
+		
+		Put_Line("Exiting Buffer");
 	end buffer;
 	
 	task body producer is
@@ -91,25 +97,33 @@ procedure Part6 is
 				accept close do
 					done := true;
 				end close;
+			else
+				null;
 			end select;
 		end loop;
+		Put_Line("Exiting Producer");
 	end producer;
 	
 	task body consumer is
+		done: Boolean := false;
 		sum: Integer := 0;
 		n: Integer;
 	begin
 		loop
+			exit when done;
 			t_buff.pop(n => n);
-			Put("Pop  '"); Put(n); Put_Line("'");
 			sum := sum + n;
+			Put("Pop  '"); Put(n); Put_Line("'");
+			Put("Sum is  '"); Put(sum); Put_Line("'");
 			if sum >= 100 then
 				t_buff.close; -- Must close the buffer first so it can release a potentially waiting producer
 				t_prod.close;
+				done := true;
 			end if;
 		end loop;
+		Put_Line("Exiting Consumer");
 	end consumer;
 	
 begin
 	null;
-end Part6;
+end part6;
