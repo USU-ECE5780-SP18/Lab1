@@ -13,7 +13,6 @@ use  Text_Io;
 procedure Part5 is
 	f3_deadline: Time;
 	f3_finished: Boolean := false;
-	f3_missed_dl: Boolean := false;
 
 	task type watch_dog is
 		entry prime(deadline : in Time);
@@ -29,13 +28,11 @@ procedure Part5 is
 				
 				-- if f3 is running print warning
 				if active = true and then f3_finished = false then
-					f3_missed_dl := true;
 					Put_Line(" - F3 missed its deadline");
 				end if;
 			end if;
 			select
 				accept prime(deadline : Time) do
-					f3_missed_dl := false;
 					f3_finished := false;
 					dl := deadline;
 					active := true;
