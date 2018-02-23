@@ -106,7 +106,7 @@ procedure part6 is
 			
 			n := Integer(25.0 * Random(rng)); -- generate a random number between 0 and 25
 			--Put("Push '"); Put(n); Put_Line("'");
-                        Put_Line("Push '" & Integer'Image(n) & "'";
+			Put_Line("Push '" & Integer'Image(n) & "'");
 			t_buff.push(n => n);
 			select
 				accept close do
@@ -127,14 +127,14 @@ procedure part6 is
 		loop
 			exit when done;
 			t_buff.pop(n => n);
-                        sum := sum + n;
-                        Put_Line("Pop '" & Integer'Image(n) & "'";
-                        Put_Line("Sum is '" & Integer'Image(sum) & "'";
+			sum := sum + n;
+			Put_Line("Pop '" & Integer'Image(n) & "'");
+			Put_Line("Sum is '" & Integer'Image(sum) & "'");
 			--Put("Pop  '"); Put(n); Put_Line("'");
 			--Put("Sum is  '"); Put(sum); Put_Line("'");
 			if sum >= 100 then
-				t_buff.close; -- Must close the buffer first so it can release a potentially waiting producer
 				t_prod.close;
+				t_buff.close; -- Must close the buffer first so it can release a potentially waiting producer
 				done := true;
 			end if;
 		end loop;
