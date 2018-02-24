@@ -14,8 +14,10 @@ procedure Part5 is
 	f3_deadline: Time;
 	f3_finished: Boolean := false;
 
+	--task in charge of starting and advising when f3 starts, 
+	--and prints a message when f3 misses its deadline
 	task type watch_dog is
-		entry prime(deadline : in Time);
+		entry prime(deadline : in Time);--begin the watch_dog
 	end watch_dog;
 	task body watch_dog is
 		active: Boolean := false;
@@ -31,7 +33,7 @@ procedure Part5 is
 					Put_Line(" - F3 missed its deadline");
 				end if;
 			end if;
-			select
+			select --starts here, and primes for watch_dog delay. sets the deadline time
 				accept prime(deadline : Time) do
 					f3_finished := false;
 					dl := deadline;
@@ -101,7 +103,7 @@ begin
 			f3_time := 0.2 + (0.4 * Random(rng)); -- give f3 a random execution time between 0.2 and 0.6
 			
 			f3_deadline := boot_time + f1_next;
-			f3_watch.prime(f3_deadline);
+			f3_watch.prime(f3_deadline);--start the watch_dog for f3
 			F(name => " - F3", run_time => Duration(f3_time), boot_time => boot_time);
 			f3_finished := true;
 			

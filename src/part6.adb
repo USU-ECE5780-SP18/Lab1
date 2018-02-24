@@ -46,7 +46,7 @@ procedure part6 is
 	begin
 		loop
 			exit when done;
-			select
+			select--can either put stuff in, take out, or close
 				when not full =>
 					accept push(n: Integer) do
 						-- Thanks to our condition on accept the 'empty' in "front = back && empty" is implied
@@ -77,14 +77,14 @@ procedure part6 is
 							empty := true;
 						end if;
 					end pop;
-				or
+				or --used only when consumer sends out to close
 					accept close do
 						done := true;
 					end close;
 			end select;
 		end loop;
 		
-		select
+		select --this statement only exists if the consumer closes when the producer wants to push.
 			accept push(n: Integer) do
 				null;
 			end push;
@@ -105,10 +105,9 @@ procedure part6 is
 			exit when done;
 			
 			n := Integer(25.0 * Random(rng)); -- generate a random number between 0 and 25
-			--Put("Push '"); Put(n); Put_Line("'");
 			Put_Line("Push '" & Integer'Image(n) & "'");
-			t_buff.push(n => n);
-			select
+			t_buff.push(n => n); --send to buffer
+			select --accepts close sent from consumer when done
 				accept close do
 					done := true;
 				end close;
@@ -126,15 +125,13 @@ procedure part6 is
 	begin
 		loop
 			exit when done;
-			t_buff.pop(n => n);
+			t_buff.pop(n => n);--takes out from buffer and adds to sum
 			sum := sum + n;
 			Put_Line("Pop '" & Integer'Image(n) & "'");
 			Put_Line("Sum is '" & Integer'Image(sum) & "'");
-			--Put("Pop  '"); Put(n); Put_Line("'");
-			--Put("Sum is  '"); Put(sum); Put_Line("'");
-			if sum >= 100 then
+			if sum >= 100 then --sends signals to buffer and producer to finish
 				t_prod.close;
-				t_buff.close; -- Must close the buffer first so it can release a potentially waiting producer
+				t_buff.close;
 				done := true;
 			end if;
 		end loop;

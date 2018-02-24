@@ -38,10 +38,10 @@ procedure Part4 is
 	end F;
 
 begin
-	vTime := 0.0;
-	f1_prev := 0.0;
-	f1_next := 1.0;
-	f3_flag := False;
+	vTime := 0.0; --the running counter 
+	f1_prev := 0.0; -- used to know when f1 starts
+	f1_next := 1.0; --used to help with drift, and know when the next round should start
+	f3_flag := False; --flag to know if f3 can start
 	boot_time := Ada.Calendar.Clock;
 
 	loop
